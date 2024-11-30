@@ -66,7 +66,6 @@ export const ModalComponent = ({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation();
 
     if (value.toLowerCase() === 'enter') {
       setValue('');
