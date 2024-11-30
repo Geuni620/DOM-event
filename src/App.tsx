@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { Button } from 'src/components/ui/button';
@@ -9,6 +9,10 @@ import { Input } from 'src/components/ui/input';
 export const App = () => {
   const [value, setValue] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const onReset = () => {
+    setValue('');
+  };
 
   const toggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -24,8 +28,7 @@ export const App = () => {
             onChange={(e) => setValue(e.target.value)}
             onKeyUp={(e) => {
               if (e.key === 'Enter') {
-                alert(value);
-                setValue('');
+                toggle();
                 return;
               }
             }}
@@ -35,7 +38,11 @@ export const App = () => {
       </main>
 
       {isModalOpen && (
-        <ModalComponent isModalOpen={isModalOpen} toggle={toggle} />
+        <ModalComponent
+          isModalOpen={isModalOpen}
+          toggle={toggle}
+          onReset={onReset}
+        />
       )}
     </React.Fragment>
   );
@@ -44,23 +51,49 @@ export const App = () => {
 export const ModalComponent = ({
   isModalOpen,
   toggle,
+  onReset,
 }: {
   isModalOpen: boolean;
   toggle: () => void;
+  onReset: () => void;
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState('');
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (value.toLowerCase() === 'enter') {
+      setValue('');
+      toggle();
+      onReset();
+      return;
+    }
+
+    alert(value);
+    return;
+  };
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }, []);
+
   return (
     <div>
       <Button onClick={toggle}>Click Me</Button>
       <Modal isOpen={isModalOpen} toggle={toggle}>
         <ModalHeader toggle={toggle}>Modal title</ModalHeader>
         <ModalBody>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
+          <form onSubmit={onSubmit}>
+            <Input ref={inputRef} value={value} onChange={onChange} />
+          </form>
         </ModalBody>
         <ModalFooter>
           <Button onClick={toggle}>Do Something</Button>{' '}
