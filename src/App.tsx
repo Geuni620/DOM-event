@@ -2,9 +2,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
-import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { Button } from 'src/components/ui/button';
 import { Input } from 'src/components/ui/input';
+
+import Modal from './Modal';
 
 export const App = () => {
   const [value, setValue] = useState('');
@@ -27,6 +28,7 @@ export const App = () => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyUp={(e) => {
+              console.log('envet');
               if (e.key === 'Enter') {
                 toggle();
                 return;
@@ -37,23 +39,17 @@ export const App = () => {
         </div>
       </main>
 
-      {isModalOpen && (
-        <ModalComponent
-          isModalOpen={isModalOpen}
-          toggle={toggle}
-          onReset={onReset}
-        />
-      )}
+      <Modal visible={isModalOpen} onClose={toggle}>
+        <ModalComponent toggle={toggle} onReset={onReset} />
+      </Modal>
     </React.Fragment>
   );
 };
 
 export const ModalComponent = ({
-  isModalOpen,
   toggle,
   onReset,
 }: {
-  isModalOpen: boolean;
   toggle: () => void;
   onReset: () => void;
 }) => {
@@ -66,6 +62,7 @@ export const ModalComponent = ({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
 
     if (value.toLowerCase() === 'enter') {
       setValue('');
@@ -85,20 +82,10 @@ export const ModalComponent = ({
   }, []);
 
   return (
-    <div>
-      <Button onClick={toggle}>Click Me</Button>
-      <Modal isOpen={isModalOpen} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Modal title</ModalHeader>
-        <ModalBody>
-          <form onSubmit={onSubmit}>
-            <Input ref={inputRef} value={value} onChange={onChange} />
-          </form>
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={toggle}>Do Something</Button>{' '}
-          <Button onClick={toggle}>Cancel</Button>
-        </ModalFooter>
-      </Modal>
+    <div className="absolute left-1/2 top-1/2 size-[500px] -translate-x-1/2 -translate-y-1/2 bg-black">
+      <form onSubmit={onSubmit}>
+        <Input ref={inputRef} value={value} onChange={onChange} />
+      </form>
     </div>
   );
 };
