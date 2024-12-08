@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useState } from 'react';
 import { Button } from 'src/components/ui/button';
 import { Input } from 'src/components/ui/input';
@@ -53,7 +53,6 @@ export const ModalComponent = ({
   toggle: () => void;
   onReset: () => void;
 }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState('');
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,16 +74,16 @@ export const ModalComponent = ({
     return;
   };
 
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      inputRef.current?.focus();
-    });
-  }, []);
-
   return (
     <div className="absolute left-1/2 top-1/2 size-[500px] -translate-x-1/2 -translate-y-1/2 bg-black">
       <form onSubmit={onSubmit}>
-        <Input ref={inputRef} value={value} onChange={onChange} />
+        <Input
+          ref={(node) => {
+            node?.focus();
+          }}
+          value={value}
+          onChange={onChange}
+        />
       </form>
     </div>
   );
